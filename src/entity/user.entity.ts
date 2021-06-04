@@ -4,6 +4,7 @@ import { BeforeInsert, Column, Entity } from "typeorm";
 import * as Bcrypt from "bcrypt";
 import { BaseEntity } from "./base.entity";
 import { Constant } from "src/constant/constant";
+import { User } from "src/model/pojo/User";
 
 @Entity({ name: "Users" })
 export class UserEntity extends BaseEntity {
@@ -21,7 +22,7 @@ export class UserEntity extends BaseEntity {
     @Column({ name: "Mobile", nullable: false })
     private _mobile: string;
 
-    constructor(name: string, email: string, mobile: string, password: string) {
+    constructor(name?: string, email?: string, mobile?: string, password?: string) {
         super();
         this._name = name;
         this._email = email;
@@ -38,7 +39,7 @@ export class UserEntity extends BaseEntity {
         return await Bcrypt.compare(password, this._password);
     }
 
-    public get name(): string { return this._name; }
-    public get email(): string { return this._email; }
-    public get mobile(): string { return this._mobile; }
+    public toUser(): User {
+        return new User(this.id, this._name, this._email, this._mobile);
+    }
 }

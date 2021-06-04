@@ -1,11 +1,11 @@
 import { Expose } from "class-transformer";
-import { IsAlpha, IsEmail, IsNumberString, Length } from "class-validator";
+import { IsAlpha, IsEmail, IsNumberString, Length, Matches } from "class-validator";
 import { Constant } from "src/constant/constant";
 import { UserEntity } from "src/entity/user.entity";
 
-export class UserDTO {
+export class RegisterRequestDTO {
 
-    @IsAlpha(undefined, { message: "Name must only contain characters." })
+    @Matches(RegExp(/^[A-Za-z\s]+$/), { message: "Name must only contain characters." })
     @Length(Constant.ALLOWED_NAME_MIN_LENGTH, Constant.ALLOWED_NAME_MAX_LENGTH, {
         message: `Name length must be in range (${Constant.ALLOWED_NAME_MIN_LENGTH},${Constant.ALLOWED_NAME_MAX_LENGTH}).`
     })
