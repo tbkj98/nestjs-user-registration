@@ -1,8 +1,9 @@
 import { IsEmail } from "class-validator";
-import { Constant } from "src/Constant";
+
 import { BeforeInsert, Column, Entity } from "typeorm";
 import * as Bcrypt from "bcrypt";
 import { BaseEntity } from "./base.entity";
+import { Constant } from "src/constant/constant";
 
 @Entity({ name: "Users" })
 export class UserEntity extends BaseEntity {

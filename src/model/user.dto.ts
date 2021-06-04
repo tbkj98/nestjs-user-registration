@@ -1,6 +1,6 @@
 import { Expose } from "class-transformer";
 import { IsAlpha, IsEmail, IsNumberString, Length } from "class-validator";
-import { Constant } from "src/Constant";
+import { Constant } from "src/constant/constant";
 import { UserEntity } from "src/entity/user.entity";
 
 export class UserDTO {

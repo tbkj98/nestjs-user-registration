@@ -13,13 +13,12 @@ export class RegisterService {
     constructor(@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>) { }
 
     async register(userDto: UserDTO) {
-        const user = new UserEntity(userDto.name, userDto.email, userDto.mobile, userDto.password);
-
+        const user = userDto.toEntity();
         try {
             return await this.userRepository.save(user);
         } catch (err) {
             if (err.code === DatabaseErrorCode.DUPLICATE_ENTRY) throw new UserAlreadyExistsException(userDto, err);
-            console.log(err);
+            this.logger.error(err);
         }
     }
 }
