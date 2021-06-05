@@ -58,7 +58,7 @@ export class UserService {
     }
 
     async resetPassword(resetToken: string, password: string) {
-        const passwordResetEntity = await this.passwordResetRepository.createQueryBuilder("PasswordResetInfo").where("PasswordResetInfo.Token = :token", { token: resetToken }).getOne();
+        const passwordResetEntity = await this.passwordResetRepository.createQueryBuilder("PasswordResetInfo").where("PasswordResetInfo.Token = ':token'", { token: resetToken }).getOne();
         if (!passwordResetEntity) return { result: passwordResetEntity };
         const updatedPassword = await Bcrypt.hash(password, Constant.BCRYPT_SALT)
         await this.userRepository.manager.query(`UPDATE "Users" SET "Password" = '${updatedPassword}' WHERE "Id" = ${passwordResetEntity.userId}`);
