@@ -28,7 +28,7 @@ export class UserService {
             const userEntity = await this.userRepository.save(user);
             return { result: true, user: userEntity.toUser() };
         } catch (err) {
-            console.error(err);
+            console.log(err);
             if (err.code === DatabaseErrorCode.DUPLICATE_ENTRY) throw new UserAlreadyExistsException(userDto, err);
         }
     }
@@ -40,7 +40,7 @@ export class UserService {
             const tokenSaveResult = await this.tokenRepository.save(new TokenEntity(this.jwtService.sign({ userId: userEntity.id })));
             return { result: true, token: tokenSaveResult.token, user: userEntity.toUser() };
         } catch (err) {
-            console.error(err);
+            console.log(err);
             throw new DatabaseException(err);
         }
     }
@@ -52,7 +52,7 @@ export class UserService {
             const resetLinkSaveResult = await this.passwordResetRepository.save(new PasswordResetEntity(this.jwtService.sign({ userId: userEntity.id }), userEntity.id));
             return { result: true, resetToken: resetLinkSaveResult.link };
         } catch (err) {
-            console.error(err);
+            console.log(err);
             throw new DatabaseException(err);
         }
     }
@@ -66,7 +66,7 @@ export class UserService {
             await this.passwordResetRepository.delete(passwordResetEntity.id);
             return { result: true };
         } catch (err) {
-            console.error(err);
+            console.log(err);
             throw new DatabaseException(err);
         }
     }
