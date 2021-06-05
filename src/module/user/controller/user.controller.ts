@@ -44,6 +44,7 @@ export class UserController {
     @Post('reset')
     async resetPassword(@Body() resetPasswordInfo: ResetPasswordRequestDTO) {
         const { result } = await this.userService.resetPassword(resetPasswordInfo.resetToken, resetPasswordInfo.password);
-        return new ResetPasswordResponseDTO(result);
+        return result;
+
     }
 }
