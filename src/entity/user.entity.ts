@@ -10,17 +10,17 @@ import { User } from "src/model/pojo/User";
 export class UserEntity extends BaseEntity {
 
     @Column({ name: "Name", nullable: false, length: 50 })
-    private _name: string;
+    readonly _name: string;
 
     @IsEmail()
     @Column({ name: "Email", nullable: false, unique: true })
-    private _email: string;
+    readonly _email: string;
 
     @Column({ name: "Password", nullable: false })
-    private _password: string;
+    _password: string;
 
     @Column({ name: "Mobile", nullable: false })
-    private _mobile: string;
+    readonly _mobile: string;
 
     constructor(name?: string, email?: string, mobile?: string, password?: string) {
         super();

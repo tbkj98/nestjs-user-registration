@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as Bcrypt from "bcrypt";
@@ -11,7 +11,7 @@ import { DatabaseException } from 'src/exception/database.exception';
 import { UserAlreadyExistsException } from 'src/exception/useralreadyexists.exception';
 import { LoginRequestDTO } from 'src/model/dto/request/login.dto';
 import { RegisterRequestDTO } from 'src/model/dto/request/user.dto';
-import { DeleteResult, Repository } from 'typeorm';
+import { getManager, Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -35,7 +35,7 @@ export class UserService {
 
     async login(loginInfo: LoginRequestDTO) {
         try {
-            const userEntity = await this.userRepository.createQueryBuilder("Users").where("Users.Email = :email", { email: loginInfo.email }).getOne();
+            const userEntity = await this.userRepository.findOne({ where: { _email: loginInfo.email } });
             if (!userEntity || !await userEntity.match(loginInfo.password)) return { result: false };
             const tokenSaveResult = await this.tokenRepository.save(new TokenEntity(this.jwtService.sign({ userId: userEntity.id })));
             return { result: true, token: tokenSaveResult.token, user: userEntity.toUser() };
@@ -47,7 +47,7 @@ export class UserService {
 
     async generateResetLink(email: string) {
         try {
-            const userEntity = await this.userRepository.createQueryBuilder("Users").where("Users.Email = :email", { email: email }).getOne();
+            const userEntity = await this.userRepository.findOne({ where: { _email: email } });
             if (!userEntity) return { result: false };
             const resetLinkSaveResult = await this.passwordResetRepository.save(new PasswordResetEntity(this.jwtService.sign({ userId: userEntity.id }), userEntity.id));
             return { result: true, resetToken: resetLinkSaveResult.link };
@@ -58,12 +58,21 @@ export class UserService {
     }
 
     async resetPassword(resetToken: string, password: string) {
-        const passwordResetEntity = await this.passwordResetRepository.createQueryBuilder("PasswordResetInfo").where("PasswordResetInfo.Token = ':token'", { token: resetToken }).getOne();
-        if (!passwordResetEntity) return { result: passwordResetEntity };
-        const updatedPassword = await Bcrypt.hash(password, Constant.BCRYPT_SALT)
-        await this.userRepository.manager.query(`UPDATE "Users" SET "Password" = '${updatedPassword}' WHERE "Id" = ${passwordResetEntity.userId}`);
-        await this.passwordResetRepository.delete(passwordResetEntity.id);
-        return { result: true };
+        try {
+            const passwordResetEntity = await this.passwordResetRepository.findOne({ where: { _token: resetToken } });
+            if (!passwordResetEntity) return { result: false };
+            const updatedPassword = await Bcrypt.hash(password, Constant.BCRYPT_SALT);
+
+            await getManager().transaction(async transactionalEntityManager => {
+                await transactionalEntityManager.update(UserEntity, { id: passwordResetEntity.userId }, { _password: updatedPassword });
+                await transactionalEntityManager.delete(PasswordResetEntity, {"UserId": passwordResetEntity.userId});
+            });
+
+            return { result: true };
+        } catch (err) {
+            console.log(err);
+            throw new DatabaseException(err);
+        }
     }
 
     async logout() {

@@ -5,10 +5,10 @@ import { BaseEntity } from "./base.entity";
 export class PasswordResetEntity extends BaseEntity {
 
     @Column({ name: "Token", nullable: false })
-    private _token: string;
+    readonly _token: string;
 
     @Column({ name: "UserId", nullable: false, unique: true })
-    private _userId: string;
+    readonly _userId: string;
 
     constructor(link: string, userId: string) {
         super();
