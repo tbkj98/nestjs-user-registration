@@ -7,14 +7,17 @@ import { UserModule } from '../user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-const dbUrl = process.env.DATABASE_URL ? process.env.DATABASE_URL : "postgres://tbkj:Anand%40334@192.168.1.43:5432/storeman"
-console.error("Database credentials", dbUrl);
+const DB_URL = process.env.DATABASE_URL ? process.env.DATABASE_URL : "postgres://tbkj:Anand%40334@192.168.1.43:5432/storeman"
+
 @Module({
   imports: [
     UserModule,
     TypeOrmModule.forRoot({
       type: "postgres",
-      url: dbUrl,
+      url: DB_URL,
+      ssl: {
+        rejectUnauthorized: false
+      },
       entities: [UserEntity, TokenEntity, PasswordResetEntity],
       synchronize: true,
     })
