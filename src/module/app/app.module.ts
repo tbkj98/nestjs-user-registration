@@ -11,12 +11,7 @@ import { PasswordResetEntity } from 'src/entity/reset.entity';
   imports: [
     UserModule,
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: '192.168.1.43',
-      port: 5432,
-      username: 'tbkj',
-      password: 'Anand@334',
-      database: 'storeman',
+      url: process.env.DATABASE_URL ? process.env.DATABASE_URL : "postgres://tbkj:Anand%40334@192.168.1.43:5432/storeman",
       entities: [UserEntity, TokenEntity, PasswordResetEntity],
       synchronize: true,
     })
