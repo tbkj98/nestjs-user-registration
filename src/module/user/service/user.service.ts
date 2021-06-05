@@ -58,17 +58,12 @@ export class UserService {
     }
 
     async resetPassword(resetToken: string, password: string) {
-        try {
-            const passwordResetEntity = await this.passwordResetRepository.createQueryBuilder("PasswordResetInfo").where("PasswordResetInfo.Token = :token", { token: resetToken }).getOne();
-            if (!passwordResetEntity) return { result: false };
-            const updatedPassword = await Bcrypt.hash(password, Constant.BCRYPT_SALT)
-            await this.userRepository.manager.query(`UPDATE "Users" SET "Password" = '${updatedPassword}' WHERE "Id" = ${passwordResetEntity.userId}`);
-            await this.passwordResetRepository.delete(passwordResetEntity.id);
-            return { result: true };
-        } catch (err) {
-            console.log(err);
-            throw new DatabaseException(err);
-        }
+        const passwordResetEntity = await this.passwordResetRepository.createQueryBuilder("PasswordResetInfo").where("PasswordResetInfo.Token = :token", { token: resetToken }).getOne();
+        if (!passwordResetEntity) return { result: false };
+        const updatedPassword = await Bcrypt.hash(password, Constant.BCRYPT_SALT)
+        await this.userRepository.manager.query(`UPDATE "Users" SET "Password" = '${updatedPassword}' WHERE "Id" = ${passwordResetEntity.userId}`);
+        await this.passwordResetRepository.delete(passwordResetEntity.id);
+        return { result: true };
     }
 
     async logout() {
