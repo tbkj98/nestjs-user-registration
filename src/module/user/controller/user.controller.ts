@@ -1,5 +1,4 @@
-import { Body, Controller, Post, UseFilters } from '@nestjs/common';
-import { DatabaseExceptionFilter } from 'src/exception/filter/database.exception.filter';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ForgotPasswordRequestDTO } from 'src/model/dto/request/forgot.dto';
 import { LoginRequestDTO } from 'src/model/dto/request/login.dto';
 import { ResetPasswordRequestDTO } from 'src/model/dto/request/reset.dto';
@@ -13,7 +12,6 @@ import { UserService } from '../service/user.service';
 
 
 @Controller('user')
-@UseFilters(new DatabaseExceptionFilter())
 export class UserController {
     constructor(private readonly userService: UserService) { }
 

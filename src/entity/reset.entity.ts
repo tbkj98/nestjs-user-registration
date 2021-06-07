@@ -1,21 +1,24 @@
-import { Column, Entity } from "typeorm";
+import { User } from "src/model/pojo/User";
+import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 import { BaseEntity } from "./base.entity";
+import { UserEntity } from "./user.entity";
 
 @Entity({ name: "PasswordResetInfo" })
 export class PasswordResetEntity extends BaseEntity {
 
     @Column({ name: "Token", nullable: false })
-    readonly _token: string;
+    private readonly _token: string;
 
-    @Column({ name: "UserId", nullable: false, unique: true })
-    readonly _userId: string;
+    @OneToOne(() => UserEntity, {eager:true, nullable:false, onUpdate:"NO ACTION", })
+    @JoinColumn({referencedColumnName:"_id", name:"UserId"})
+    private readonly _user: UserEntity;
 
-    constructor(link: string, userId: string) {
+    constructor(link: string, user: UserEntity) {
         super();
         this._token = link;
-        this._userId = userId;
+        this._user = user;
     }
 
     public get link(): string { return this._token; }
-    public get userId(): string { return this._userId }
+    public get user(): UserEntity { return this._user }
 }
